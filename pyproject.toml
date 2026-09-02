@@ -1,0 +1,26 @@
+[project]
+name = "mines-tools-bot"
+version = "0.1.0"
+description = "Telegram bot for Mines 4 crystal prices monitoring"
+authors = [
+    { name = "Volodin Alexandr Sergeevich", email = "endocrinologist@ya.ru" }
+]
+# Фиксируем Python 3.12, так как 3.14 ещё не вышел и вызывает конфликты
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "aiogram (>=3.13.1,<4.0.0)",
+    "pydantic-settings (>=2.5.2,<3.0.0)",
+    "sqlalchemy (>=2.0.35,<3.0.0)",
+    "aiosqlite (>=0.20.0,<0.21.0)",
+    "aiocron (>=1.8,<2.0)",
+    "httpx (>=0.27.2,<0.28.0)",
+    "yarl (>=1.9.4,<2.0.0)",
+]
+
+# КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Отключаем режим сборки пакета
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=1.8.0,<2.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,27 @@
+name: Deploy Mines Bot
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 199.189.250.199
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /projects/bots/mines-bot
+            git pull origin master
+            docker compose down
+            docker compose up -d --build
+            docker image prune -f
+            echo "Deployment successful!"

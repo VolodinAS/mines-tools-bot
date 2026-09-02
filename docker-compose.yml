@@ -1,0 +1,9 @@
+services:
+  mines-bot:
+    build: .
+    container_name: mines-bot
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
