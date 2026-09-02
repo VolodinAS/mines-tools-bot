@@ -1,10 +1,8 @@
 name: Deploy Mines Bot
-
 on:
   push:
     branches:
       - master
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,7 +18,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /projects/bots/mines-tools-bot
-            git pull origin master
+            # Игнорируем ошибку, если git pull не сработает, чтобы не прерывать деплой
+            git pull origin master || echo "Warning: git pull failed, continuing with existing code"
             docker compose down
             docker compose up -d --build
             docker image prune -f
