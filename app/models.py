@@ -12,8 +12,10 @@ class CrystalPrice(Base):
     __tablename__ = "crystal_prices"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    # Явно указываем timezone=True и используем tz.utc для генерации времени
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(tz.utc)
+        DateTime(timezone=True),
+        default=lambda: datetime.now(tz.utc)
     )
     green: Mapped[int] = mapped_column(Integer)
     blue: Mapped[int] = mapped_column(Integer)

@@ -14,11 +14,14 @@ class MinesAPIClient:
             "Accept": "*/*",
         }
         self.timeout = 10.0
+        # Если DEBUG=True, отключаем проверку SSL (решает проблемы с прокси/антивирусом на Windows)
+        self.verify_ssl = not settings.DEBUG
     
     async def get_crystal_prices(self) -> dict[str, int]:
         """Получает актуальные цены на кристаллы из API."""
         url = str(self.base_url / "CrystalPrices")
-        async with httpx.AsyncClient() as client:
+        # Передаём verify=self.verify_ssl
+        async with httpx.AsyncClient(verify=self.verify_ssl) as client:
             response = await client.get(url, headers=self.headers, timeout=self.timeout)
             response.raise_for_status()
             return response.json()

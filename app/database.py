@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone as tz
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
@@ -5,13 +7,10 @@ from app.config import settings
 from app.models import Base, CrystalPrice
 
 
-engine = create_async_engine(settings.DATABASE_URL, echo=False)
+engine = create_async_engine(settings.database_url, echo=False)
+AsyncSessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 
-# async_sessionmaker из SQLAlchemy 2.0 решает проблему с варнингами PyCharm
-AsyncSessionLocal = async_sessionmaker(
-    bind=engine,
-    expire_on_commit=False,
-)
+MAX_PRICE_AGE_HOURS = 6
 
 
 async def init_db() -> None:
@@ -26,6 +25,23 @@ async def get_last_price() -> CrystalPrice | None:
         stmt = select(CrystalPrice).order_by(CrystalPrice.timestamp.desc()).limit(1)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
+
+
+async def is_price_outdated() -> bool:
+    """Проверяет, устарели ли данные о ценах (старше 6 часов)."""
+    last_price = await get_last_price()
+    if last_price is None:
+        return True
+    
+    now = datetime.now(tz.utc)
+    cutoff_time = now - timedelta(hours=MAX_PRICE_AGE_HOURS)
+    
+    # СТРАХОВКА: если в БД записано naive-время, делаем его aware (предполагая, что это UTC)
+    last_ts = last_price.timestamp
+    if last_ts.tzinfo is None:
+        last_ts = last_ts.replace(tzinfo=tz.utc)
+    
+    return last_ts < cutoff_time
 
 
 async def save_price(prices: dict[str, int]) -> None:
