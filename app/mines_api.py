@@ -1,5 +1,3 @@
-import os
-
 import httpx
 from yarl import URL
 
@@ -16,11 +14,8 @@ class MinesAPIClient:
             "Accept": "*/*",
         }
         self.timeout = 10.0
-        
-        # Читаем настройку из .env. По умолчанию True (безопасно).
-        # Если API игры имеет битый сертификат, установим API_VERIFY_SSL=false
-        verify_env = os.getenv("API_VERIFY_SSL", "true").lower()
-        self.verify_ssl = verify_env == "true"
+        # Используем настройку напрямую из Pydantic Settings
+        self.verify_ssl = settings.API_VERIFY_SSL
     
     async def get_crystal_prices(self) -> dict[str, int]:
         """Получает актуальные цены на кристаллы из API."""

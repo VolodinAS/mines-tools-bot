@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     ADMIN_CHAT_ID: int
     MINES_API_TOKEN: str
     DATABASE_URL: str = "sqlite+aiosqlite:////app/data/mines.db"
+    API_VERIFY_SSL: bool = True  # <-- ДОБАВЛЕНО: явное объявление переменной
     
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -32,7 +33,6 @@ class Settings(BaseSettings):
         """Возвращает URL БД: локальный для DEBUG, из .env для продакшена."""
         if not self.DEBUG:
             return self.DATABASE_URL
-        
         data_dir = Path(__file__).parent.parent / "data"
         data_dir.mkdir(exist_ok=True)
         return f"sqlite+aiosqlite:///{data_dir / 'mines.db'}"
